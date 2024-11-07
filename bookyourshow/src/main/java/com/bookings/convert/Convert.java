@@ -33,4 +33,12 @@ public class Convert {
         }
         return theater;
     }
+
+    public Theater convert01(TheaterDto theaterDto) {
+        Theater theater = new Theater();
+        if(!ObjectUtils.isEmpty(theaterDto)) {
+            BeanUtils.copyProperties(theaterDto, theater);
+        }
+        return theater;
+    }
 }
