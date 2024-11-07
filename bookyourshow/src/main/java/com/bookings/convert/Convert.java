@@ -33,4 +33,12 @@ public class Convert {
 //        }
 //        return theater;
 //    }
+
+    public MovieDto convert123(Movie movie) {
+        MovieDto movieDto = new MovieDto();
+        if(!ObjectUtils.isEmpty(movie)) {
+            BeanUtils.copyProperties(movie, movieDto);
+        }
+        return movieDto;
+    }
 }
