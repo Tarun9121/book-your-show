@@ -26,23 +26,11 @@ public class Convert {
         return movieDto;
     }
 
-//    public Theater convert(TheaterDto theaterDto) {
-//        Theater theater = new Theater();
-//        if(!ObjectUtils.isEmpty(theaterDto)) {
-//            BeanUtils.copyProperties(theaterDto, theater);
-//        }
-//        return theater;
-//    }
-
-<<<<<<< HEAD
-    public MovieDto convert123(Movie movie) {
-=======
-    public MovieDto convert00(Movie movie) {
->>>>>>> 8f9986c663c611f9f8585e447141a98afce096dd
-        MovieDto movieDto = new MovieDto();
-        if(!ObjectUtils.isEmpty(movie)) {
-            BeanUtils.copyProperties(movie, movieDto);
+    public Theater convert(TheaterDto theaterDto) {
+        Theater theater = new Theater();
+        if (!ObjectUtils.isEmpty(theaterDto)) {
+            BeanUtils.copyProperties(theaterDto, theater);
         }
-        return movieDto;
+        return theater;
     }
 }
