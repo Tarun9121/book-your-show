@@ -2,17 +2,26 @@ package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
-import com.bookings.dto.BaseResponse;
+import com.bookings.convert.TheaterConvert;
+import com.bookings.dto.MovieDto;
 import com.bookings.dto.TheaterDto;
 import com.bookings.entity.Theater;
+import com.bookings.entity.TheaterMovie;
 import com.bookings.exception.ApiException;
 import com.bookings.repository.TheaterRepository;
 import com.bookings.service.TheaterService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -21,8 +30,10 @@ public class TheaterServiceImpl implements TheaterService {
     private TheaterRepository theaterRepository;
     @Autowired
     private Convert transform;
+    @Autowired
+    private TheaterConvert theaterConvert;
 
-    public BaseResponse<Object> registerTheater(TheaterDto theaterDto) {
+    public ResponseEntity<String> registerTheater(TheaterDto theaterDto) {
         try {
             if(ObjectUtils.isEmpty(theaterDto)) {
                throw new ApiException(BookYourShow.DATA_NULL);
@@ -30,10 +41,26 @@ public class TheaterServiceImpl implements TheaterService {
             Theater theater = transform.convert(theaterDto);
             theaterRepository.save(theater);
             log.info("Theater Details saved");
-            return BaseResponse.success(HttpStatus.CREATED, BookYourShow.DATA_SAVED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.DATA_SAVED);
+        } catch (ApiException api) {
+          log.error("{}", api.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(api.getMessage());
         } catch (Exception e) {
             log.error("{}", e.getMessage());
-            return BaseResponse.error(HttpStatus.BAD_REQUEST, BookYourShow.DATA_SAVING_FAILURE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.DATA_SAVING_FAILURE);
         }
+    }
+
+    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId) {
+        Theater theater = theaterRepository.findById(theaterId)
+                .orElseThrow(() -> new ApiException(BookYourShow.THEATER_NOT_FOUND));
+        List<TheaterMovie> registeredMovies = theater.getRegisteredMovies();
+        List<MovieDto> registeredMoviesDto = new ArrayList<>();
+        registeredMovies.forEach(theaterMovie -> {
+            MovieDto movieDto = new MovieDto();
+            BeanUtils.copyProperties(theaterMovie.getMovie(), movieDto);
+            registeredMoviesDto.add(movieDto);
+        });
+        return (ResponseEntity<MovieDto>) registeredMoviesDto;
     }
 }

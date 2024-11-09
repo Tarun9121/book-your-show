@@ -4,16 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-public class MovieDto  {
+public class AvailableTheatersDto {
     private UUID id;
     private String name;
-    private String genre;
-    private String description;
-    private LocalDate releaseDate;
-    private Double rating;
-    private String duration;
+    private Integer pincode;
+    private List<AvailableShowDto> availableShows = new ArrayList<>();
 }

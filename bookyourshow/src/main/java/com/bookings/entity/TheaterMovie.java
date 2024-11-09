@@ -26,12 +26,15 @@ public class TheaterMovie {
     @GenericGenerator(name="uuid", strategy = "org.hibernate.id.UUIDGenerator")
     @Type(type="uuid-char")
     private UUID id;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "movie_id")
     private Movie movie;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="theater_id")
     private Theater theater;
+
     @OneToMany(mappedBy = "theaterMovie", cascade = CascadeType.ALL)
     private List<Show> shows = new ArrayList<>();
 }

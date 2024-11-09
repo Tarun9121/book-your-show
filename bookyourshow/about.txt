@@ -1,0 +1,7 @@
+POST - /user/register       pl = userDto            desc: create account for user
+POST - /movie/register      pl = movieDto           desc: register a movie
+POST - /theater/register    pl = theaterDto         desc: register a theater
+GET - /theater/{theaterId}
+POST - /theater-movie/register      pl = TheaterMovieRequestDto desc: movie team will decide which theaters to release
+POST - /show/{theaterId}/{movieId}  pl = ShowRequestDto         desc:
+GET - /show/{showId}

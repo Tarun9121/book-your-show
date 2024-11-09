@@ -2,7 +2,6 @@ package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
-import com.bookings.dto.BaseResponse;
 import com.bookings.dto.MovieDto;
 import com.bookings.entity.Movie;
 import com.bookings.exception.ApiException;
@@ -23,7 +22,8 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private Convert transform;
 
-    public BaseResponse<String> registerMovie(MovieDto movieDto) {
+    @Override
+    public ResponseEntity<String> registerMovie(MovieDto movieDto) {
         try {
             if(ObjectUtils.isEmpty(movieDto)) {
                 throw new ApiException(BookYourShow.DATA_NULL);
@@ -31,10 +31,10 @@ public class MovieServiceImpl implements MovieService {
             Movie movie = transform.convert(movieDto);
             movieRepository.save(movie);
             log.info(BookYourShow.DATA_SAVED);
-            return BaseResponse.success(HttpStatus.CREATED, BookYourShow.DATA_SAVED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.DATA_SAVED);
         } catch (Exception e) {
             log.error(BookYourShow.SOMETHING_WENT_WRONG + " {}", e.getMessage());
-            return BaseResponse.error(HttpStatus.BAD_REQUEST, BookYourShow.DATA_SAVING_FAILURE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.DATA_SAVING_FAILURE);
         }
     }
 }

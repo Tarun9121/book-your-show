@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     // Add custom query methods here if needed
+    boolean existsByEmailAndMobileNo(String email, String mobileNo);
 }

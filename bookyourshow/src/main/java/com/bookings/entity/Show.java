@@ -31,6 +31,6 @@ public class Show {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "theater_movie_id")
     private TheaterMovie theaterMovie;
-    private LocalDate releaseDate;
-    private LocalTime showTime;8
+    private LocalDate showDate;
+    private LocalTime showTime;
 }
