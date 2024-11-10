@@ -37,7 +37,7 @@ public class ShowController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ShowDto> getShowById(@PathVariable UUID id) {
-        return showService.getShowById(id);
+        return showService.getShowResponseById(id);
     }
 
     @GetMapping("/search/{movieId}")

@@ -1,23 +1,21 @@
 package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
+import com.bookings.convert.Convert;
 import com.bookings.dao.ShowDao;
 import com.bookings.dao.TheaterMovieDao;
 import com.bookings.dto.AvailableShowDto;
 import com.bookings.dto.AvailableTheatersDto;
-import com.bookings.dto.ShowRequestDto;
 import com.bookings.dto.ShowDto;
+import com.bookings.dto.ShowRequestDto;
+import com.bookings.dto.TheaterMovieNativeDto;
 import com.bookings.entity.Movie;
 import com.bookings.entity.Show;
 import com.bookings.entity.Theater;
 import com.bookings.entity.TheaterMovie;
 import com.bookings.exception.ApiException;
-import com.bookings.repository.MovieRepository;
 import com.bookings.repository.ShowRepository;
-import com.bookings.repository.TheaterMovieRepository;
-import com.bookings.repository.TheaterRepository;
 import com.bookings.service.ShowService;
-import com.bookings.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.NonUniqueResultException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,39 +32,41 @@ import java.util.UUID;
 @Slf4j
 public class ShowServiceImpl implements ShowService {
 
-    @Autowired
-    private ShowRepository showRepository;
+    private final ShowRepository showRepository;
+    private final ShowDao showDao;
+    private final TheaterServiceImpl theaterService;
+    private final TheaterMovieDao theaterMovieDao;
+    private final BookingUtility bookingUtility;
+    private final TheaterMovieServiceImpl theaterMovieService;
+    private final MovieServiceImpl movieService;
+    private final Convert convert;
 
     @Autowired
-    private TheaterMovieRepository theaterMovieRepository;
-
-    @Autowired
-    private ShowDao showDao;
-
-    @Autowired
-    private TheaterRepository theaterRepository;  // Add this
-
-    @Autowired
-    private TheaterMovieDao theaterMovieDao;
-
-
-
-    @Autowired
-    private MovieRepository movieRepository;  // And this
-    @Autowired
-    private Convert convert;
+    public ShowServiceImpl(
+            BookingUtility bookingUtility,
+            ShowRepository showRepository,
+            ShowDao showDao,
+            TheaterServiceImpl theaterService,
+            TheaterMovieDao theaterMovieDao,
+            TheaterMovieServiceImpl theaterMovieService,
+            MovieServiceImpl movieService,
+            Convert convert) {
+        this.bookingUtility = bookingUtility;
+        this.showRepository = showRepository;
+        this.showDao = showDao;
+        this.theaterService = theaterService;
+        this.theaterMovieDao = theaterMovieDao;
+        this.theaterMovieService = theaterMovieService;
+        this.movieService = movieService;
+        this.convert = convert;
+    }
 
     @Override
     public ResponseEntity<String> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDtos) {
         try {
-            Theater theater = theaterRepository.findById(theaterId)
-                    .orElseThrow(() -> new ApiException("Theater not found with ID: " + theaterId));
-
-            Movie movie = movieRepository.findById(movieId)
-                    .orElseThrow(() -> new ApiException("Movie not found with ID: " + movieId));
-
-            TheaterMovie theaterMovie = theaterMovieRepository.findByTheaterAndMovie(theater, movie)
-                    .orElseThrow(() -> new ApiException("TheaterMovie association not found between Theater and Movie"));
+            Theater theater = theaterService.getTheaterById(theaterId);
+            Movie movie = movieService.getMovieById(movieId);
+            TheaterMovie theaterMovie = theaterMovieService.getTheaterMovie(theater, movie);
 
             for (ShowRequestDto showRequestDto : showRequestDtos) {
                 Show show = new Show();
@@ -75,7 +74,6 @@ public class ShowServiceImpl implements ShowService {
                 show.setShowDate(showRequestDto.getShowDate());
                 show.setShowTime(showRequestDto.getShowTime());
 
-                // Save each show individually
                 showRepository.save(show);
             }
 
@@ -92,7 +90,7 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public ResponseEntity<ShowDto> getShowById(UUID id) {
+    public ResponseEntity<ShowDto> getShowResponseById(UUID id) {
         ShowDto showDto = new ShowDto();
         try {
             Show show = showRepository.findById(id)
@@ -134,16 +132,25 @@ public class ShowServiceImpl implements ShowService {
     @Override
     public ResponseEntity<List<AvailableTheatersDto>> availableShows(UUID movieId) {
         try {
-            List<TheaterMovie> availableTheaterIds = theaterMovieRepository.findByMovieId(movieId);
+            List<TheaterMovieNativeDto> associatedTheaters = theaterMovieService.getAssociatedTheaters(movieId);
             List<AvailableTheatersDto> availableTheatersResponse = new ArrayList<>();
 
-            availableTheaterIds.forEach(theaterId -> {
-                UUID theaterMovieId = theaterMovieDao.findId(theaterId.getTheater().getId(), movieId);
-                if(ObjectUtils.isEmpty(theaterMovieId))
+            associatedTheaters.forEach(theaterMovie -> {
+                UUID theaterMovieId = theaterMovie.getId();
+
+                if(theaterMovieId == null || theaterMovieId.equals(new UUID(0, 0))) {
                     throw new ApiException(BookYourShow.THEATER_NOT_REGISTERED);
+                }
+
                 List<Show> availableShows = showDao.availableShowsByTheaterMovieId(theaterMovieId);
-                Theater theater = theaterRepository.findById(theaterId.getTheater().getId())
-                        .orElseThrow(() -> new ApiException(BookYourShow.THEATER_NOT_FOUND));
+                availableShows.forEach(show -> {
+                    show.setTheaterMovie(null);
+                });
+                Theater theater = theaterService.getTheaterById(theaterMovie.getTheaterId());
+
+                if(ObjectUtils.isEmpty(theater)) {
+                    throw new ApiException(BookYourShow.THEATER_NOT_FOUND);
+                }
                 AvailableTheatersDto availableTheater = new AvailableTheatersDto();
 
                 if(!ObjectUtils.isEmpty(theater)) {
@@ -154,6 +161,12 @@ public class ShowServiceImpl implements ShowService {
                         AvailableShowDto showDto = new AvailableShowDto();
                         if(!ObjectUtils.isEmpty(show)) {
                             BeanUtils.copyProperties(show, showDto);
+                            log.info("total no of seats: {}", theater.getNoOfSeats());
+                            log.info("{}", bookingUtility.seatsBooked(show.getId()));
+                            System.out.println("total no of seats: " + theater.getNoOfSeats());
+                            System.out.println("total booked seats: " + bookingUtility.seatsBooked(show.getId()));
+                            Integer avilableSeats = theater.getNoOfSeats() - bookingUtility.seatsBooked(show.getId());
+                            showDto.setSeatsAvailable(avilableSeats);
                             listOfShows.add(showDto);
                         }
                     });
@@ -166,5 +179,10 @@ public class ShowServiceImpl implements ShowService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
         }
+    }
+
+    public Show getShowById(UUID showId) {
+        return showRepository.findById(showId)
+                .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": Show ID " + showId));
     }
 }

@@ -3,6 +3,7 @@ package com.bookings.controller;
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
 import com.bookings.service.BookingService;
+import com.bookings.service.implementation.BookingServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,10 @@ import java.util.UUID;
 @RequestMapping("/booking")
 @Tag(name = "Booking", description = "APIs for Managing Bookings")
 public class BookingController {
-    private final BookingService bookingService;
+    private final BookingServiceImpl bookingService;
 
     @Autowired
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingServiceImpl bookingService) {
         this.bookingService = bookingService;
     }
 

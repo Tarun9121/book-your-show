@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ShowService {
     ResponseEntity<String> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDto);
 
-    ResponseEntity<ShowDto> getShowById(UUID id);
+    ResponseEntity<ShowDto> getShowResponseById(UUID id);
 
     ResponseEntity<String> deleteShow(UUID id);
 

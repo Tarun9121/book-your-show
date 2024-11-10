@@ -14,16 +14,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.UUID;
+
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final Convert convert;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private Convert convert;
+    public UserServiceImpl(UserRepository userRepository, Convert convert) {
+        this.userRepository = userRepository;
+        this.convert = convert;
+    }
 
     @Override
     public ResponseEntity<String> registerUser(UserDto userDto) {
@@ -47,5 +51,10 @@ public class UserServiceImpl implements UserService {
             log.error("An unexpected error occurred: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    public User getUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": User ID " + userId));
     }
 }

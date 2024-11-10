@@ -21,6 +21,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,5 +63,16 @@ public class TheaterServiceImpl implements TheaterService {
             registeredMoviesDto.add(movieDto);
         });
         return (ResponseEntity<MovieDto>) registeredMoviesDto;
+    }
+
+    public Optional<Theater> getTheaterById(UUID theaterId, Optional optional) {
+        return theaterRepository.findById(theaterId);
+    }
+
+    public Theater getTheaterById(UUID theaterId) {
+        Theater theater = getTheaterById(theaterId, Optional.empty())
+                .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + " with theaterId: " + theaterId));
+        theater.setRegisteredMovies(null);
+        return theater;
     }
 }

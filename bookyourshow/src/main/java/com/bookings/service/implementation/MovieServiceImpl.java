@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 public class MovieServiceImpl implements MovieService {
@@ -36,5 +38,10 @@ public class MovieServiceImpl implements MovieService {
             log.error(BookYourShow.SOMETHING_WENT_WRONG + " {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.DATA_SAVING_FAILURE);
         }
+    }
+
+    public Movie getMovieById(UUID movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + " with movieId: " + movieId));
     }
 }
