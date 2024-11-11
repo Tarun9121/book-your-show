@@ -2,6 +2,8 @@ package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
+import com.bookings.convert.ShowConvert;
+import com.bookings.convert.TheaterConvert;
 import com.bookings.dao.ShowDao;
 import com.bookings.dao.TheaterMovieDao;
 import com.bookings.dto.AvailableShowDto;
@@ -40,9 +42,12 @@ public class ShowServiceImpl implements ShowService {
     private final TheaterMovieServiceImpl theaterMovieService;
     private final MovieServiceImpl movieService;
     private final Convert convert;
+    private final TheaterConvert theaterConvert;
+    private final ShowConvert showConvert;
 
     @Autowired
     public ShowServiceImpl(
+            TheaterConvert theaterConvert,
             BookingUtility bookingUtility,
             ShowRepository showRepository,
             ShowDao showDao,
@@ -50,7 +55,10 @@ public class ShowServiceImpl implements ShowService {
             TheaterMovieDao theaterMovieDao,
             TheaterMovieServiceImpl theaterMovieService,
             MovieServiceImpl movieService,
+            ShowConvert showConvert,
             Convert convert) {
+        this.showConvert = showConvert;
+        this.theaterConvert = theaterConvert;
         this.bookingUtility = bookingUtility;
         this.showRepository = showRepository;
         this.showDao = showDao;
@@ -178,6 +186,35 @@ public class ShowServiceImpl implements ShowService {
             return ResponseEntity.status(HttpStatus.OK).body(availableTheatersResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        }
+    }
+
+    public List<AvailableTheatersDto> availableShows01(UUID movieId) {
+        try {
+            List<TheaterMovie> availableTheaters = theaterMovieService.getAssociatedTheaters01(movieId);
+            List<AvailableTheatersDto> availableTheatersResponse = new ArrayList<>();
+
+            availableTheaters.forEach(theaterMovie -> {
+                UUID theaterMovieId = theaterMovie.getId();
+
+                if(theaterMovieId == null || theaterMovieId.equals(new UUID(0, 0))) {
+                    throw new ApiException(BookYourShow.THEATER_NOT_REGISTERED);
+                }
+
+                List<Show> availableShows = showRepository.findByTheaterMovie(theaterMovie);
+                AvailableTheatersDto availableTheatersDto = new AvailableTheatersDto();
+
+                availableTheatersDto.setTheater(theaterConvert.convert(theaterMovie.getTheater()));
+                availableTheatersDto.setAvailableShows(showConvert.convert(availableShows));
+
+                availableTheatersResponse.add(availableTheatersDto);
+            });
+
+            return availableTheatersResponse;
+        } catch(ApiException api) {
+            throw new ApiException(BookYourShow.SOMETHING_WENT_WRONG);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

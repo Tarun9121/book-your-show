@@ -15,7 +15,6 @@ import java.util.UUID;
 public class TheaterDto extends BaseResponseDto {
     private UUID id;
     private String name;
-    private List<MovieDto> registeredMovies = new ArrayList<>();
     private Integer noOfSeats;
     private String country;
     private String state;

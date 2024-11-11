@@ -28,8 +28,6 @@ public class Movie {
     @GenericGenerator(name="uuid", strategy = "org.hibernate.id.UUIDGenerator")
     @Type(type="uuid-char")
     private UUID id;
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private List<TheaterMovie> registeredTheaters;
     private String name;
     private String genre;
     private String description;

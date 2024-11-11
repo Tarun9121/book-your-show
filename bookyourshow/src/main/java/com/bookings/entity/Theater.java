@@ -28,8 +28,6 @@ public class Theater {
     private UUID id;
     private String name;
     private Integer noOfSeats;
-    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
-    private List<TheaterMovie> registeredMovies;
     private String country;
     private String state;
     private String district;

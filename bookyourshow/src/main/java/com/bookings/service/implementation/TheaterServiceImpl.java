@@ -52,27 +52,25 @@ public class TheaterServiceImpl implements TheaterService {
         }
     }
 
-    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId) {
-        Theater theater = theaterRepository.findById(theaterId)
-                .orElseThrow(() -> new ApiException(BookYourShow.THEATER_NOT_FOUND));
-        List<TheaterMovie> registeredMovies = theater.getRegisteredMovies();
-        List<MovieDto> registeredMoviesDto = new ArrayList<>();
-        registeredMovies.forEach(theaterMovie -> {
-            MovieDto movieDto = new MovieDto();
-            BeanUtils.copyProperties(theaterMovie.getMovie(), movieDto);
-            registeredMoviesDto.add(movieDto);
-        });
-        return (ResponseEntity<MovieDto>) registeredMoviesDto;
-    }
+//    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId) {
+//        Theater theater = theaterRepository.findById(theaterId)
+//                .orElseThrow(() -> new ApiException(BookYourShow.THEATER_NOT_FOUND));
+//        List<TheaterMovie> registeredMovies = theater.getRegisteredMovies();
+//        List<MovieDto> registeredMoviesDto = new ArrayList<>();
+//        registeredMovies.forEach(theaterMovie -> {
+//            MovieDto movieDto = new MovieDto();
+//            BeanUtils.copyProperties(theaterMovie.getMovie(), movieDto);
+//            registeredMoviesDto.add(movieDto);
+//        });
+//        return (ResponseEntity<MovieDto>) registeredMoviesDto;
+//    }
 
     public Optional<Theater> getTheaterById(UUID theaterId, Optional optional) {
         return theaterRepository.findById(theaterId);
     }
 
     public Theater getTheaterById(UUID theaterId) {
-        Theater theater = getTheaterById(theaterId, Optional.empty())
+        return getTheaterById(theaterId, Optional.empty())
                 .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + " with theaterId: " + theaterId));
-        theater.setRegisteredMovies(null);
-        return theater;
     }
 }

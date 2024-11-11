@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface TheaterService {
     public ResponseEntity<String> registerTheater(TheaterDto theaterDto);
-    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId);
+//    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId);
 }

@@ -76,4 +76,9 @@ public class TheaterMovieServiceImpl implements TheaterMovieService {
         List<TheaterMovieNativeDto> list = theaterMovieDao.getAssociatedTheaters(movieId);
         return list;
     }
+
+    public List<TheaterMovie> getAssociatedTheaters01(UUID movieId) {
+        List<TheaterMovie> list = theaterMovieRepository.findByMovieId(movieService.getMovieById(movieId));
+        return list;
+    }
 }

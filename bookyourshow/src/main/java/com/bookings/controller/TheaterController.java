@@ -27,8 +27,8 @@ public class TheaterController {
         return theaterService.registerTheater(theaterDto);
     }
 
-    @GetMapping("/{theaterId}")
-    public ResponseEntity<MovieDto> registeredMovies(@PathVariable("theaterId")UUID theaterId) {
-        return theaterService.registeredMovies(theaterId);
-    }
+//    @GetMapping("/{theaterId}")
+//    public ResponseEntity<MovieDto> registeredMovies(@PathVariable("theaterId")UUID theaterId) {
+//        return theaterService.registeredMovies(theaterId);
+//    }
 }

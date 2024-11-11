@@ -10,8 +10,6 @@ import java.util.UUID;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class AvailableTheatersDto {
-    private UUID id;
-    private String name;
-    private Integer pincode;
+    private TheaterDto theater;
     private List<AvailableShowDto> availableShows = new ArrayList<>();
 }

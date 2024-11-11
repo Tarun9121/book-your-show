@@ -14,13 +14,6 @@ public class TheaterConvert {
         TheaterDto theaterDto = new TheaterDto();
         if(!ObjectUtils.isEmpty(theater)) {
             BeanUtils.copyProperties(theater, theaterDto);
-            if(!CollectionUtils.isEmpty(theater.getRegisteredMovies())) {
-                MovieDto movieDto = new MovieDto();
-                theater.getRegisteredMovies().forEach(theaterMovie -> {
-                    BeanUtils.copyProperties(theaterMovie.getMovie(), movieDto);
-                    theaterDto.getRegisteredMovies().add(movieDto);
-                });
-            }
         }
         return theaterDto;
     }
