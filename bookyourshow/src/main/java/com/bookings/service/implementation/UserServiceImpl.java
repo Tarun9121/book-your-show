@@ -53,6 +53,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public ResponseEntity<String> softDeleteUser(UUID id) {
+        try {
+            User user = userRepository.findActiveById(id)
+                    .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": User ID " + id));
+
+            user.setDeleted(true);
+            userRepository.save(user);
+
+            log.info(BookYourShow.DATA_DELETED);
+            return ResponseEntity.status(HttpStatus.OK).body(BookYourShow.DATA_DELETED);
+
+        } catch (ApiException e) {
+            log.error(BookYourShow.DATA_NOT_FOUND + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (Exception e) {
+            log.error(BookYourShow.SOMETHING_WENT_WRONG + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BookYourShow.SOMETHING_WENT_WRONG);
+        }
+    }
+
     public User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": User ID " + userId));

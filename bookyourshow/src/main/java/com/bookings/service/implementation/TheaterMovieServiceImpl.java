@@ -78,7 +78,7 @@ public class TheaterMovieServiceImpl implements TheaterMovieService {
     }
 
     public List<TheaterMovie> getAssociatedTheaters01(UUID movieId) {
-        List<TheaterMovie> list = theaterMovieRepository.findByMovieId(movieService.getMovieById(movieId));
+        List<TheaterMovie> list = theaterMovieRepository.findByMovie(movieService.getMovieById(movieId));
         return list;
     }
 }

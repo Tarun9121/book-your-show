@@ -41,8 +41,8 @@ public class ShowController {
     }
 
     @GetMapping("/search/{movieId}")
-    public ResponseEntity<List<AvailableTheatersDto>> availableShows(@PathVariable("movieId") UUID movieId) {
-        return showService.availableShows(movieId);
+    public List<AvailableTheatersDto> availableShows(@PathVariable("movieId") UUID movieId) {
+        return showService.availableShows01(movieId);
     }
 
 

@@ -21,11 +21,13 @@ import com.bookings.service.ShowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -69,6 +71,13 @@ public class ShowServiceImpl implements ShowService {
         this.convert = convert;
     }
 
+    @Transactional
+    @Modifying
+    public void updateShow(Show show) {
+        showRepository.save(show);
+        log.info("Show: available seats updated {}", show.getAvailableSeats());
+    }
+
     @Override
     public ResponseEntity<String> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDtos) {
         try {
@@ -79,6 +88,7 @@ public class ShowServiceImpl implements ShowService {
             for (ShowRequestDto showRequestDto : showRequestDtos) {
                 Show show = new Show();
                 show.setTheaterMovie(theaterMovie);
+                show.setAvailableSeats(theater.getNoOfSeats());
                 show.setShowDate(showRequestDto.getShowDate());
                 show.setShowTime(showRequestDto.getShowTime());
 
@@ -174,7 +184,7 @@ public class ShowServiceImpl implements ShowService {
                             System.out.println("total no of seats: " + theater.getNoOfSeats());
                             System.out.println("total booked seats: " + bookingUtility.seatsBooked(show.getId()));
                             Integer avilableSeats = theater.getNoOfSeats() - bookingUtility.seatsBooked(show.getId());
-                            showDto.setSeatsAvailable(avilableSeats);
+                            showDto.setAvailableSeats(avilableSeats);
                             listOfShows.add(showDto);
                         }
                     });
@@ -206,6 +216,11 @@ public class ShowServiceImpl implements ShowService {
 
                 availableTheatersDto.setTheater(theaterConvert.convert(theaterMovie.getTheater()));
                 availableTheatersDto.setAvailableShows(showConvert.convert(availableShows));
+
+//                availableTheatersDto.getAvailableShows().forEach(show -> {
+//                    Integer availableSeats = theaterMovie.getTheater().getNoOfSeats() - bookingUtility.seatsBooked(show.getId());
+//                    show.setSeatsAvailable(availableSeats);
+//                });
 
                 availableTheatersResponse.add(availableTheatersDto);
             });

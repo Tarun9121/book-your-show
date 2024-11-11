@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface TheaterService {
     public ResponseEntity<String> registerTheater(TheaterDto theaterDto);
 //    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId);
+    ResponseEntity<String> softDeleteTheater(UUID id);
 }

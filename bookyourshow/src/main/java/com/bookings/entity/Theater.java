@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -33,4 +34,6 @@ public class Theater {
     private String district;
     private String locality;
     private Integer pincode;
+    @Column(nullable = false)
+    private boolean deleted = false; // Soft delete flag
 }

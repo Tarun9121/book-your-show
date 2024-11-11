@@ -25,6 +25,28 @@ public class MovieServiceImpl implements MovieService {
     private Convert transform;
 
     @Override
+    public ResponseEntity<String> softDeleteMovie(UUID id) {
+        try {
+            Movie movie = movieRepository.findActiveById(id)
+                    .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": Movie ID " + id));
+
+            movie.setDeleted(true);
+            movieRepository.save(movie);
+
+            log.info(BookYourShow.DATA_DELETED);
+            return ResponseEntity.status(HttpStatus.OK).body(BookYourShow.DATA_DELETED);
+
+        } catch (ApiException e) {
+            log.error(BookYourShow.DATA_NOT_FOUND + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (Exception e) {
+            log.error(BookYourShow.SOMETHING_WENT_WRONG + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BookYourShow.SOMETHING_WENT_WRONG);
+        }
+    }
+
+    @Override
     public ResponseEntity<String> registerMovie(MovieDto movieDto) {
         try {
             if(ObjectUtils.isEmpty(movieDto)) {

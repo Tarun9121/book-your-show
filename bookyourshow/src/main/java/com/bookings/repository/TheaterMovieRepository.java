@@ -21,5 +21,5 @@ public interface TheaterMovieRepository extends JpaRepository<TheaterMovie, UUID
     @Query("SELECT tm FROM TheaterMovie tm WHERE tm.movie.id = :movieId")
     List<TheaterMovie> getAssociatedTheaters(UUID movieId);
 
-    List<TheaterMovie> findByMovieId(Movie movie);
+    List<TheaterMovie> findByMovie(Movie movie);
 }

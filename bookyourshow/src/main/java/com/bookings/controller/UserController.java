@@ -2,9 +2,12 @@ package com.bookings.controller;
 
 import com.bookings.dto.UserDto;
 import com.bookings.service.implementation.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -18,6 +21,12 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDto userDto) {
         return  userServiceImpl.registerUser(userDto);
+    }
+
+    @Operation(summary = "Soft Delete User", description = "Soft delete a user by setting the isDeleted flag")
+    @DeleteMapping("/soft-delete/{id}")
+    public ResponseEntity<String> softDeleteUser(@PathVariable UUID id) {
+        return userServiceImpl.softDeleteUser(id);
     }
 
 //    @GetMapping("/showUser")

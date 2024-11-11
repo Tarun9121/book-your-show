@@ -49,12 +49,18 @@ public class BookingServiceImpl implements BookingService {
             User user = userService.getUserById(bookingRequestDto.getUserId());
             Show show = showService.getShowById(bookingRequestDto.getShowId());
 
+            if(bookingRequestDto.getNoOfSeatsSelected() >= show.getAvailableSeats()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.SEATS_NOT_AVAILABLE);
+            }
+
             Booking booking = new Booking();
             booking.setUser(user);
             booking.setShow(show);
             booking.setNoOfSeatsSelected(bookingRequestDto.getNoOfSeatsSelected());
 
             bookingRepository.save(booking);
+            show.setAvailableSeats(show.getAvailableSeats() - booking.getNoOfSeatsSelected());
+            showService.updateShow(show);
             log.info(BookYourShow.DATA_SAVED + " for User ID: {}", bookingRequestDto.getUserId());
             return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.DATA_SAVED);
 

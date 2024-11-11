@@ -52,6 +52,28 @@ public class TheaterServiceImpl implements TheaterService {
         }
     }
 
+    @Override
+    public ResponseEntity<String> softDeleteTheater(UUID id) {
+        try {
+            Theater theater = theaterRepository.findActiveById(id)
+                    .orElseThrow(() -> new ApiException(BookYourShow.DATA_NOT_FOUND + ": Theater ID " + id));
+
+            theater.setDeleted(true);
+            theaterRepository.save(theater);
+
+            log.info(BookYourShow.DATA_DELETED);
+            return ResponseEntity.status(HttpStatus.OK).body(BookYourShow.DATA_DELETED);
+
+        } catch (ApiException e) {
+            log.error(BookYourShow.DATA_NOT_FOUND + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (Exception e) {
+            log.error(BookYourShow.SOMETHING_WENT_WRONG + ": {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BookYourShow.SOMETHING_WENT_WRONG);
+        }
+    }
+
 //    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId) {
 //        Theater theater = theaterRepository.findById(theaterId)
 //                .orElseThrow(() -> new ApiException(BookYourShow.THEATER_NOT_FOUND));

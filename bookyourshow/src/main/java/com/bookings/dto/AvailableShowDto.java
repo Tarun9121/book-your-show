@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data @AllArgsConstructor @NoArgsConstructor
 public class AvailableShowDto {
     private UUID id;
-    private Integer seatsAvailable;
+    private Integer availableSeats;
     private LocalDate showDate;
     private LocalTime showTime;
 }

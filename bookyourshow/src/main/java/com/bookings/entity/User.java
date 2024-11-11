@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,6 +28,8 @@ public class User {
     private String fullName;
     private String email;
     private String mobileNo;
+    @Column(nullable = false)
+    private boolean deleted = false; // Soft delete flag
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Booking> bookingList = new ArrayList<>();
