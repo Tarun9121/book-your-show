@@ -46,6 +46,7 @@ public class BookingServiceImpl implements BookingService {
             if(ObjectUtils.isEmpty(bookingRequestDto)) {
                 throw new ApiException(BookYourShow.DATA_NULL);
             }
+
             User user = userService.getUserById(bookingRequestDto.getUserId());
             Show show = showService.getShowById(bookingRequestDto.getShowId());
 
@@ -60,8 +61,10 @@ public class BookingServiceImpl implements BookingService {
 
             bookingRepository.save(booking);
             show.setAvailableSeats(show.getAvailableSeats() - booking.getNoOfSeatsSelected());
+
             showService.updateShow(show);
             log.info(BookYourShow.DATA_SAVED + " for User ID: {}", bookingRequestDto.getUserId());
+
             return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.DATA_SAVED);
 
         } catch (ApiException e) {

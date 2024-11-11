@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.ACCOUNT_CREATED);
         } catch (ApiException e) {
             log.error("Validation error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.CREATED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("An unexpected error occurred: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

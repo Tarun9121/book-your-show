@@ -2,7 +2,6 @@ package com.bookings.controller;
 
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
-import com.bookings.service.BookingService;
 import com.bookings.service.implementation.BookingServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

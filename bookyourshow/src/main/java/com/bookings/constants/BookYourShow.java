@@ -11,4 +11,5 @@ public class  BookYourShow {
     public static final String THEATER_NOT_FOUND = "Theater Not found";
     public static final String THEATER_NOT_REGISTERED = "Theater not registered with movie";
     public static final String SEATS_NOT_AVAILABLE = "Not enough seats for the current show";
+    public static final String DATA_DELETED = "Data your are looking for is deleted";
 }
