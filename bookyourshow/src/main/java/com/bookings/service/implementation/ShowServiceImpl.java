@@ -89,6 +89,9 @@ public class ShowServiceImpl implements ShowService {
                 Show show = new Show();
                 show.setTheaterMovie(theaterMovie);
                 show.setAvailableSeats(theater.getNoOfSeats());
+                if(movie.getReleaseDate().isAfter(show.getShowDate())) {
+                    throw new ApiException("Movie Not Released Yet");
+                }
                 show.setShowDate(showRequestDto.getShowDate());
                 show.setShowTime(showRequestDto.getShowTime());
 
