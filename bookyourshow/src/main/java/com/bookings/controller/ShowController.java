@@ -22,10 +22,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/show")
 public class ShowController {
+    private final ShowService showService;
 
     @Autowired
-    private ShowServiceImpl showService;
-
+    public ShowController(ShowServiceImpl showService) {
+        this.showService = showService;
+    }
 
     @PostMapping("/create/{theaterId}/{movieId}")
     public ResponseEntity<String> createShows(
@@ -42,7 +44,7 @@ public class ShowController {
 
     @GetMapping("/search/{movieId}")
     public List<AvailableTheatersDto> availableShows(@PathVariable("movieId") UUID movieId) {
-        return showService.availableShows01(movieId);
+        return showService.availableShows(movieId);
     }
 
 

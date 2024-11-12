@@ -90,13 +90,10 @@ public class ShowServiceImpl implements ShowService {
                 show.setTheaterMovie(theaterMovie);
                 show.setAvailableSeats(theater.getNoOfSeats());
 
-                log.warn("movie release date: {}", movie.getReleaseDate());
-                log.warn("Show date: {}", showRequestDto.getShowDate());
-                log.warn("isAfter: {}", movie.getReleaseDate().isAfter(showRequestDto.getShowDate()));
-
                 if(movie.getReleaseDate().isAfter(showRequestDto.getShowDate())) {
                     throw new ApiException("Movie Not Released Yet");
                 }
+
                 show.setShowDate(showRequestDto.getShowDate());
                 show.setShowTime(showRequestDto.getShowTime());
 
@@ -155,61 +152,61 @@ public class ShowServiceImpl implements ShowService {
         }
     }
 
-    @Override
-    public ResponseEntity<List<AvailableTheatersDto>> availableShows(UUID movieId) {
+//    @Override
+//    public ResponseEntity<List<AvailableTheatersDto>> availableShows(UUID movieId) {
+//        try {
+//            List<TheaterMovieNativeDto> associatedTheaters = theaterMovieService.getAssociatedTheaters(movieId);
+//            List<AvailableTheatersDto> availableTheatersResponse = new ArrayList<>();
+//
+//            associatedTheaters.forEach(theaterMovie -> {
+//                UUID theaterMovieId = theaterMovie.getId();
+//
+//                if(theaterMovieId == null || theaterMovieId.equals(new UUID(0, 0))) {
+//                    throw new ApiException(BookYourShow.THEATER_NOT_REGISTERED);
+//                }
+//
+//                List<Show> availableShows = showDao.availableShowsByTheaterMovieId(theaterMovieId);
+//                availableShows.forEach(show -> {
+//                    show.setTheaterMovie(null);
+//                });
+//                Theater theater = theaterService.getTheaterById(theaterMovie.getTheaterId());
+//
+//                if(ObjectUtils.isEmpty(theater)) {
+//                    throw new ApiException(BookYourShow.THEATER_NOT_FOUND);
+//                }
+//                AvailableTheatersDto availableTheater = new AvailableTheatersDto();
+//
+//                if(!ObjectUtils.isEmpty(theater)) {
+//                    BeanUtils.copyProperties(theater, availableTheater);
+//                    List<AvailableShowDto> listOfShows = new ArrayList<>();
+//
+//                    availableShows.forEach(show -> {
+//                        AvailableShowDto showDto = new AvailableShowDto();
+//                        if(!ObjectUtils.isEmpty(show)) {
+//                            BeanUtils.copyProperties(show, showDto);
+//                            log.info("total no of seats: {}", theater.getNoOfSeats());
+//                            log.info("{}", bookingUtility.seatsBooked(show.getId()));
+//                            System.out.println("total no of seats: " + theater.getNoOfSeats());
+//                            System.out.println("total booked seats: " + bookingUtility.seatsBooked(show.getId()));
+//                            Integer avilableSeats = theater.getNoOfSeats() - bookingUtility.seatsBooked(show.getId());
+//                            showDto.setAvailableSeats(avilableSeats);
+//                            listOfShows.add(showDto);
+//                        }
+//                    });
+//                    availableTheater.setAvailableShows(listOfShows);
+//                    availableTheatersResponse.add(availableTheater);
+//                }
+//            });
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(availableTheatersResponse);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+//        }
+//    }
+
+    public List<AvailableTheatersDto> availableShows(UUID movieId) {
         try {
-            List<TheaterMovieNativeDto> associatedTheaters = theaterMovieService.getAssociatedTheaters(movieId);
-            List<AvailableTheatersDto> availableTheatersResponse = new ArrayList<>();
-
-            associatedTheaters.forEach(theaterMovie -> {
-                UUID theaterMovieId = theaterMovie.getId();
-
-                if(theaterMovieId == null || theaterMovieId.equals(new UUID(0, 0))) {
-                    throw new ApiException(BookYourShow.THEATER_NOT_REGISTERED);
-                }
-
-                List<Show> availableShows = showDao.availableShowsByTheaterMovieId(theaterMovieId);
-                availableShows.forEach(show -> {
-                    show.setTheaterMovie(null);
-                });
-                Theater theater = theaterService.getTheaterById(theaterMovie.getTheaterId());
-
-                if(ObjectUtils.isEmpty(theater)) {
-                    throw new ApiException(BookYourShow.THEATER_NOT_FOUND);
-                }
-                AvailableTheatersDto availableTheater = new AvailableTheatersDto();
-
-                if(!ObjectUtils.isEmpty(theater)) {
-                    BeanUtils.copyProperties(theater, availableTheater);
-                    List<AvailableShowDto> listOfShows = new ArrayList<>();
-
-                    availableShows.forEach(show -> {
-                        AvailableShowDto showDto = new AvailableShowDto();
-                        if(!ObjectUtils.isEmpty(show)) {
-                            BeanUtils.copyProperties(show, showDto);
-                            log.info("total no of seats: {}", theater.getNoOfSeats());
-                            log.info("{}", bookingUtility.seatsBooked(show.getId()));
-                            System.out.println("total no of seats: " + theater.getNoOfSeats());
-                            System.out.println("total booked seats: " + bookingUtility.seatsBooked(show.getId()));
-                            Integer avilableSeats = theater.getNoOfSeats() - bookingUtility.seatsBooked(show.getId());
-                            showDto.setAvailableSeats(avilableSeats);
-                            listOfShows.add(showDto);
-                        }
-                    });
-                    availableTheater.setAvailableShows(listOfShows);
-                    availableTheatersResponse.add(availableTheater);
-                }
-            });
-
-            return ResponseEntity.status(HttpStatus.OK).body(availableTheatersResponse);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
-        }
-    }
-
-    public List<AvailableTheatersDto> availableShows01(UUID movieId) {
-        try {
-            List<TheaterMovie> availableTheaters = theaterMovieService.getAssociatedTheaters01(movieId);
+            List<TheaterMovie> availableTheaters = theaterMovieService.getAssociatedTheaters(movieId);
             List<AvailableTheatersDto> availableTheatersResponse = new ArrayList<>();
 
             availableTheaters.forEach(theaterMovie -> {

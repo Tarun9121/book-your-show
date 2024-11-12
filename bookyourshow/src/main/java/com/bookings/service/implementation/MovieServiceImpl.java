@@ -2,6 +2,7 @@ package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
+import com.bookings.convert.MovieConvert;
 import com.bookings.dto.MovieDto;
 import com.bookings.entity.Movie;
 import com.bookings.exception.ApiException;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,6 +25,18 @@ public class MovieServiceImpl implements MovieService {
     private MovieRepository movieRepository;
     @Autowired
     private Convert transform;
+    @Autowired
+    private MovieConvert movieConvert;
+
+    public ResponseEntity<List<MovieDto>> getAllMovies() {
+        try {
+            List<Movie> movieList = movieRepository.findAllActiveMovie();
+            List<MovieDto> movieDtoList = movieConvert.convert(movieList);
+            return ResponseEntity.status(HttpStatus.OK).body(movieDtoList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 
     @Override
     public ResponseEntity<String> softDeleteMovie(UUID id) {

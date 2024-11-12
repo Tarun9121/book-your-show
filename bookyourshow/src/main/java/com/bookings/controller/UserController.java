@@ -23,6 +23,11 @@ public class UserController {
         return  userServiceImpl.registerUser(userDto);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getUser(@PathVariable("userId") UUID userId) {
+        return userServiceImpl.getUserById(userId);
+    }
+
     @Operation(summary = "Soft Delete User", description = "Soft delete a user by setting the isDeleted flag")
     @DeleteMapping("/soft-delete/{id}")
     public ResponseEntity<String> softDeleteUser(@PathVariable UUID id) {

@@ -72,12 +72,12 @@ public class TheaterMovieServiceImpl implements TheaterMovieService {
                 .orElseThrow(() -> new ApiException("TheaterMovie association not found between Theater and Movie"));
     }
 
-    public List<TheaterMovieNativeDto> getAssociatedTheaters(UUID movieId) {
-        List<TheaterMovieNativeDto> list = theaterMovieDao.getAssociatedTheaters(movieId);
-        return list;
-    }
+//    public List<TheaterMovieNativeDto> getAssociatedTheaters(UUID movieId) {
+//        List<TheaterMovieNativeDto> list = theaterMovieDao.getAssociatedTheaters(movieId);
+//        return list;
+//    }
 
-    public List<TheaterMovie> getAssociatedTheaters01(UUID movieId) {
+    public List<TheaterMovie> getAssociatedTheaters(UUID movieId) {
         List<TheaterMovie> list = theaterMovieRepository.findByMovie(movieService.getMovieById(movieId));
         return list;
     }

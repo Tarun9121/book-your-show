@@ -27,12 +27,16 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class TheaterServiceImpl implements TheaterService {
-    @Autowired
     private TheaterRepository theaterRepository;
-    @Autowired
     private Convert transform;
-    @Autowired
     private TheaterConvert theaterConvert;
+
+    @Autowired
+    public TheaterServiceImpl(TheaterRepository theaterRepository, Convert convert, TheaterConvert theaterConvert) {
+            this.theaterRepository = theaterRepository;
+            this.theaterConvert = theaterConvert;
+            this.transform = convert;
+    }
 
     public ResponseEntity<String> registerTheater(TheaterDto theaterDto) {
         try {

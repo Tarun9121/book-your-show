@@ -2,6 +2,7 @@ package com.bookings.controller;
 
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
+import com.bookings.service.BookingService;
 import com.bookings.service.implementation.BookingServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @RequestMapping("/booking")
 @Tag(name = "Booking", description = "APIs for Managing Bookings")
 public class BookingController {
-    private final BookingServiceImpl bookingService;
+    private final BookingService bookingService;
 
     @Autowired
     public BookingController(BookingServiceImpl bookingService) {

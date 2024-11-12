@@ -10,10 +10,7 @@ import java.util.UUID;
 
 public interface ShowService {
     ResponseEntity<String> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDto);
-
     ResponseEntity<ShowDto> getShowResponseById(UUID id);
-
     ResponseEntity<String> deleteShow(UUID id);
-
-    public ResponseEntity<List<AvailableTheatersDto>> availableShows(UUID movieId);
+    List<AvailableTheatersDto> availableShows(UUID movieId);
 }
