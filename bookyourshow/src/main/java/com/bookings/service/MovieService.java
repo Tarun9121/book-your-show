@@ -10,5 +10,6 @@ public interface MovieService {
     public ResponseEntity<String> registerMovie(MovieDto movieDto);
     public ResponseEntity<String> softDeleteMovie(UUID id);
     public ResponseEntity<List<MovieDto>> getAllMovies();
+    public ResponseEntity<MovieDto> getMovieDtoById(UUID movieId);
 
 }

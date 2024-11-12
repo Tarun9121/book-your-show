@@ -13,4 +13,5 @@ public class  BookYourShow {
     public static final String SEATS_NOT_AVAILABLE = "Not enough seats for the current show";
     public static final String DATA_DELETED = "Data your are looking for is deleted";
     public static final String USER_NOT_FOUND = "User not found";
+    public static final String ACTOR_ALREADY_EXIST = "Actor alraedy existed";
 }

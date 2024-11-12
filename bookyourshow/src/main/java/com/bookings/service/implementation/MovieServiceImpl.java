@@ -4,6 +4,7 @@ import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
 import com.bookings.convert.MovieConvert;
 import com.bookings.dto.MovieDto;
+import com.bookings.entity.Actor;
 import com.bookings.entity.Movie;
 import com.bookings.exception.ApiException;
 import com.bookings.repository.MovieRepository;
@@ -30,7 +31,7 @@ public class MovieServiceImpl implements MovieService {
 
     public ResponseEntity<List<MovieDto>> getAllMovies() {
         try {
-            List<Movie> movieList = movieRepository.findAllActiveMovie();
+            List<Movie> movieList = movieRepository.findAllLatestMovies();
             List<MovieDto> movieDtoList = movieConvert.convert(movieList);
             return ResponseEntity.status(HttpStatus.OK).body(movieDtoList);
         } catch (Exception e) {
@@ -73,6 +74,16 @@ public class MovieServiceImpl implements MovieService {
         } catch (Exception e) {
             log.error(BookYourShow.SOMETHING_WENT_WRONG + " {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.DATA_SAVING_FAILURE);
+        }
+    }
+
+    public ResponseEntity<MovieDto> getMovieDtoById(UUID movieId) {
+        try {
+            Movie movie = getMovieById(movieId);
+            MovieDto movieDto = transform.convert(movie);
+            return ResponseEntity.status(HttpStatus.OK).body(movieDto);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 

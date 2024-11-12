@@ -13,6 +13,9 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
     @Query("SELECT m FROM Movie m WHERE m.deleted = false")
     List<Movie> findAllActiveMovie();
 
+    @Query(nativeQuery = true, value = "SELECT * FROM movies ORDER BY release_date DESC")
+    List<Movie> findAllLatestMovies();
+
     @Query("SELECT m FROM Movie m WHERE m.id = :id AND m.deleted = false")
     Optional<Movie> findActiveById(UUID id);
 }
