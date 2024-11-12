@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUser(@PathVariable("userId") UUID userId) {
-        return userServiceImpl.getUserById(userId);
+        return userServiceImpl.getUserDetailsById(userId);
     }
 
     @Operation(summary = "Soft Delete User", description = "Soft delete a user by setting the isDeleted flag")

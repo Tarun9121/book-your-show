@@ -78,7 +78,8 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<UserDto> getUserDetailsById(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(BookYourShow.USER_NOT_FOUND));
-
+        UserDto userDto = convert.convert(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
     public User getUserById(UUID userId) {
