@@ -10,10 +10,12 @@ import com.bookings.exception.ApiException;
 import com.bookings.repository.MovieRepository;
 import com.bookings.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -83,6 +85,26 @@ public class MovieServiceImpl implements MovieService {
             MovieDto movieDto = transform.convert(movie);
             return ResponseEntity.status(HttpStatus.OK).body(movieDto);
         } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<MovieDto>> searchMovies(String name) {
+        try {
+            if(StringUtils.isEmpty(name)) {
+                throw new ApiException(BookYourShow.DATA_NULL);
+            }
+
+            List<Movie> relatedMovies = movieRepository.searchMovie(name);
+
+            if(CollectionUtils.isEmpty(relatedMovies)) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+
+            List<MovieDto> movieDtoList = movieConvert.convert(relatedMovies);
+            return ResponseEntity.status(HttpStatus.OK).body(movieDtoList);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
