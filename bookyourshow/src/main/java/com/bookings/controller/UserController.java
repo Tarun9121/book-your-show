@@ -34,9 +34,9 @@ public class UserController {
         return userServiceImpl.softDeleteUser(id);
     }
 
-//    @GetMapping("/showUser")
-//    public  BaseResponse<String> showUser(@RequestBody UserDto userDto){
-//
-//    }
+    @GetMapping("/email/{emailId}")
+    public ResponseEntity<UserDto> getUser(@PathVariable("emailId") String emailId) {
+        return userServiceImpl.getUserByEmail(emailId);
+    }
 
 }

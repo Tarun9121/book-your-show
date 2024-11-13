@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.bookings.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = false")
     Optional<User> findActiveById(UUID id);
+
+    @Query(nativeQuery = true, value="select * from users where email = :emailId")
+    Optional<User> findUserByEmailId(@Param("emailId") String emailId);
 }

@@ -91,6 +91,23 @@ public class TheaterServiceImpl implements TheaterService {
 //        return (ResponseEntity<MovieDto>) registeredMoviesDto;
 //    }
 
+    public ResponseEntity<List<TheaterDto>> getAllTheaters() {
+        List<TheaterDto> allTheaterDtos = new ArrayList<>();
+        try {
+            List<Theater> allExistingTheaters = theaterRepository.findAllActiveTheater();
+
+            if(CollectionUtils.isEmpty(allExistingTheaters)) {
+                return ResponseEntity.noContent().build();
+            }
+
+            allTheaterDtos = theaterConvert.convert(allExistingTheaters);
+
+            return ResponseEntity.ok(allTheaterDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        }
+    }
+
     public Optional<Theater> getTheaterById(UUID theaterId, Optional optional) {
         return theaterRepository.findById(theaterId);
     }

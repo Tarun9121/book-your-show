@@ -8,6 +8,7 @@ import com.bookings.exception.ApiException;
 import com.bookings.repository.UserRepository;
 import com.bookings.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,26 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository, Convert convert) {
         this.userRepository = userRepository;
         this.convert = convert;
+    }
+
+    public ResponseEntity<UserDto> getUserByEmail(String email) {
+        try {
+            if(StringUtils.isEmpty(email)) {
+               throw new ApiException(BookYourShow.DATA_NULL);
+            }
+
+            User existingUser = userRepository.findUserByEmailId(email)
+                    .orElseThrow(() -> new ApiException(BookYourShow.ACCOUNT_NOT_FOUND));
+
+            UserDto userDto = convert.convert(existingUser);
+
+            return ResponseEntity.status(HttpStatus.OK).body(userDto);
+        } catch (Exception e) {
+            UserDto userDto = new UserDto();
+            userDto.setStatus(HttpStatus.BAD_REQUEST);
+            userDto.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userDto);
+        }
     }
 
     @Override

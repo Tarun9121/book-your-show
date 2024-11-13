@@ -40,6 +40,11 @@ public class TheaterController {
         return theaterService.softDeleteTheater(id);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<TheaterDto>> getAllTheaters() {
+        return theaterService.getAllTheaters();
+    }
+
 //    @GetMapping("/{theaterId}")
 //    public ResponseEntity<MovieDto> registeredMovies(@PathVariable("theaterId")UUID theaterId) {
 //        return theaterService.registeredMovies(theaterId);
