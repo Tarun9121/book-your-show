@@ -12,4 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
     @Query("SELECT b FROM Booking b WHERE b.show.id = :showId")
     List<Booking> findByShowId(@Param("showId") UUID showId);
+    @Query("SELECT b FROM Booking b WHERE b.user.id = :userId")
+    List<Booking> findBookingsByUserId(@Param("userId") UUID userId);
+
 }

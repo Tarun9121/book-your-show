@@ -2,6 +2,7 @@ package com.bookings.controller;
 
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
+import com.bookings.dto.BookingResponseDto;
 import com.bookings.service.BookingService;
 import com.bookings.service.implementation.BookingServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +35,11 @@ public class BookingController {
     @GetMapping("/{id}")
     public ResponseEntity<BookingDto> getBookingById(@PathVariable UUID id) {
         return bookingService.getBookingById(id);
+    }
+
+    @GetMapping("/get-bookings/{userId}")
+    public ResponseEntity<List<BookingDto>> getBookingsByUserId(@PathVariable("userId") UUID userId) {
+        return bookingService.getBookingsByUserId(userId);
     }
 
 }

@@ -4,6 +4,7 @@ import com.bookings.constants.BookYourShow;
 import com.bookings.convert.BookingConvert;
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
+import com.bookings.dto.BookingResponseDto;
 import com.bookings.entity.Booking;
 import com.bookings.entity.Show;
 import com.bookings.entity.User;
@@ -15,9 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -98,6 +102,20 @@ public class BookingServiceImpl implements BookingService {
             bookingDto.setMessage(BookYourShow.DATA_NOT_FOUND);
             bookingDto.setLocalDateTime(LocalDateTime.now());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(bookingDto);
+        }
+    }
+
+    public ResponseEntity<List<BookingDto>> getBookingsByUserId(UUID userId) {
+        try {
+            List<Booking> bookingListOfUser = bookingRepository.findBookingsByUserId(userId);
+            if(CollectionUtils.isEmpty(bookingListOfUser)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+            System.out.println(bookingListOfUser.get(0).getId());
+            List<BookingDto> responseBookingDtos = bookingConvert.convert(bookingListOfUser);
+            return ResponseEntity.status(HttpStatus.OK).body(responseBookingDtos);
+        } catch(Exception e) {
+            throw new ApiException(e.getMessage());
         }
     }
 }

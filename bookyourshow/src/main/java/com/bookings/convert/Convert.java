@@ -47,6 +47,9 @@ public class Convert {
         if (!ObjectUtils.isEmpty(user)) {
             BeanUtils.copyProperties(user, userDto);
         }
+        if(!CollectionUtils.isEmpty(userDto.getBookingList())) {
+            userDto.setBookingList(null);
+        }
         return userDto;
     }
 
