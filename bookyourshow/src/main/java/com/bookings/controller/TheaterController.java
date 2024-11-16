@@ -45,6 +45,10 @@ public class TheaterController {
         return theaterService.getAllTheaters();
     }
 
+    @GetMapping("/get-theater/{theaterId}")
+    public ResponseEntity<TheaterDto> getTheater(@PathVariable("theaterId") UUID theaterId) {
+        return theaterService.getTheater(theaterId);
+    }
 //    @GetMapping("/{theaterId}")
 //    public ResponseEntity<MovieDto> registeredMovies(@PathVariable("theaterId")UUID theaterId) {
 //        return theaterService.registeredMovies(theaterId);

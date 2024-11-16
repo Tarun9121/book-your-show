@@ -4,6 +4,7 @@ import com.bookings.dto.MovieDto;
 import com.bookings.dto.TheaterDto;
 import com.bookings.dto.TheaterMovieDto;
 import com.bookings.dto.UserDto;
+import com.bookings.dto.UserRequestDto;
 import com.bookings.entity.Movie;
 import com.bookings.entity.Theater;
 import com.bookings.entity.TheaterMovie;
@@ -26,6 +27,24 @@ public class Convert {
         return movie;
     }
 
+    public UserRequestDto convertToRequesDto(User user) {
+        UserRequestDto userRequestDto = new UserRequestDto();
+
+        if(!ObjectUtils.isEmpty(user)) {
+            BeanUtils.copyProperties(user, userRequestDto);
+        }
+        return userRequestDto;
+    }
+
+    public User convert(UserRequestDto userRequestDto) {
+        User user = new User();
+
+        if(!ObjectUtils.isEmpty(userRequestDto)) {
+            BeanUtils.copyProperties(userRequestDto, user);
+        }
+        return user;
+    }
+
     public MovieDto convert(Movie movie) {
         MovieDto movieDto = new MovieDto();
         if(!ObjectUtils.isEmpty(movie)) {
@@ -46,9 +65,6 @@ public class Convert {
         UserDto userDto = new UserDto();
         if (!ObjectUtils.isEmpty(user)) {
             BeanUtils.copyProperties(user, userDto);
-        }
-        if(!CollectionUtils.isEmpty(userDto.getBookingList())) {
-            userDto.setBookingList(null);
         }
         return userDto;
     }

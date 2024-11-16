@@ -2,6 +2,7 @@ package com.bookings.controller;
 
 import com.bookings.dao.ShowDao;
 import com.bookings.dto.AvailableTheatersDto;
+import com.bookings.dto.ShowDetails;
 import com.bookings.dto.ShowDto;
 import com.bookings.dto.ShowRequestDto;
 import com.bookings.service.ShowService;
@@ -30,7 +31,7 @@ public class ShowController {
     }
 
     @PostMapping("/create/{theaterId}/{movieId}")
-    public ResponseEntity<String> createShows(
+    public ResponseEntity<List<ShowDetails>> createShows(
             @PathVariable UUID theaterId,
             @PathVariable UUID movieId,
             @RequestBody List<ShowRequestDto> showRequestDtos) {
@@ -40,6 +41,11 @@ public class ShowController {
     @GetMapping("/{id}")
     public ResponseEntity<ShowDto> getShowById(@PathVariable UUID id) {
         return showService.getShowResponseById(id);
+    }
+
+    @GetMapping("/show-details/{showId}")
+    public ResponseEntity<ShowDetails> getShowDetilasById(@PathVariable("showId") UUID showId) {
+        return showService.getShowDetailsById(showId);
     }
 
     @GetMapping("/search/{movieId}")

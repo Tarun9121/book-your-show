@@ -11,4 +11,5 @@ public interface TheaterService {
 //    public ResponseEntity<MovieDto> registeredMovies(UUID theaterId);
     ResponseEntity<String> softDeleteTheater(UUID id);
     public ResponseEntity<List<TheaterDto>> getAllTheaters();
+    ResponseEntity<TheaterDto> getTheater(UUID theaterId);
 }

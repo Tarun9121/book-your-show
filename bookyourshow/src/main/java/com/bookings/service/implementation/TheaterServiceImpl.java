@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +106,21 @@ public class TheaterServiceImpl implements TheaterService {
             return ResponseEntity.ok(allTheaterDtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        }
+    }
+
+    @Override
+    public ResponseEntity<TheaterDto> getTheater(UUID theaterId) {
+        TheaterDto theaterDto = new TheaterDto();
+        try {
+            Theater theater = getTheaterById(theaterId);
+            theaterDto = theaterConvert.convert(theater);
+            return ResponseEntity.status(HttpStatus.OK).body(theaterDto);
+        } catch (Exception e) {
+            theaterDto.setMessage("Theater not found");
+            theaterDto.setStatus(HttpStatus.BAD_REQUEST);
+            theaterDto.setLocalDateTime(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(theaterDto);
         }
     }
 

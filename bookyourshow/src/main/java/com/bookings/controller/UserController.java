@@ -1,6 +1,7 @@
 package com.bookings.controller;
 
 import com.bookings.dto.UserDto;
+import com.bookings.dto.UserRequestDto;
 import com.bookings.service.implementation.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,16 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDto userDto) {
         return  userServiceImpl.registerUser(userDto);
+    }
+
+    @PostMapping("/register-user")
+    public ResponseEntity<UserDto> registerUserDetails(@RequestBody UserRequestDto userReqDto) {
+        return userServiceImpl.registerUserDetails(userReqDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserRequestDto> loginUser(@RequestBody UserRequestDto userRequestDto) {
+        return userServiceImpl.getUserByLoginDetails(userRequestDto);
     }
 
     @GetMapping("/{userId}")

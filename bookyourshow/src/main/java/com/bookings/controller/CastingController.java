@@ -1,5 +1,6 @@
 package com.bookings.controller;
 
+import com.bookings.dto.ActorDto;
 import com.bookings.dto.CastingDto;
 import com.bookings.entity.Actor;
 import com.bookings.entity.Casting;
@@ -28,7 +29,7 @@ public class CastingController {
     }
 
     @GetMapping("/actors/{movieId}")
-    public ResponseEntity<List<Actor>> getActorsByMovieId(@PathVariable UUID movieId) {
+    public ResponseEntity<List<ActorDto>> getActorsByMovieId(@PathVariable UUID movieId) {
         return castingService.getActorsByMovieId(movieId);
     }
 }

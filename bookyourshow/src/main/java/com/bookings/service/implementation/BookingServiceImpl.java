@@ -2,9 +2,14 @@ package com.bookings.service.implementation;
 
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.BookingConvert;
+import com.bookings.dto.BaseResponseDto;
+import com.bookings.dto.BookingDetails;
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
 import com.bookings.dto.BookingResponseDto;
+import com.bookings.dto.ShowResponseDto;
+import com.bookings.dto.TheaterDto;
+import com.bookings.dto.UserDto;
 import com.bookings.entity.Booking;
 import com.bookings.entity.Show;
 import com.bookings.entity.User;
@@ -12,6 +17,7 @@ import com.bookings.exception.ApiException;
 import com.bookings.repository.BookingRepository;
 import com.bookings.service.BookingService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public ResponseEntity<String> createBooking(BookingRequestDto bookingRequestDto) {
+    public ResponseEntity<BookingDto> createBooking(BookingRequestDto bookingRequestDto) {
         try {
             if(ObjectUtils.isEmpty(bookingRequestDto)) {
                 throw new ApiException(BookYourShow.DATA_NULL);
@@ -55,7 +61,11 @@ public class BookingServiceImpl implements BookingService {
             Show show = showService.getShowById(bookingRequestDto.getShowId());
 
             if(bookingRequestDto.getNoOfSeatsSelected() >= show.getAvailableSeats()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BookYourShow.SEATS_NOT_AVAILABLE);
+                BookingDto baseResponseDto = new BookingDto();
+                baseResponseDto.setStatus(HttpStatus.BAD_REQUEST);
+                baseResponseDto.setMessage(BookYourShow.SEATS_NOT_AVAILABLE);
+                baseResponseDto.setLocalDateTime(LocalDateTime.now());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(baseResponseDto);
             }
 
             Booking booking = new Booking();
@@ -63,20 +73,21 @@ public class BookingServiceImpl implements BookingService {
             booking.setShow(show);
             booking.setNoOfSeatsSelected(bookingRequestDto.getNoOfSeatsSelected());
 
-            bookingRepository.save(booking);
+            Booking booked = bookingRepository.save(booking);
+            BookingDto bookingDto = bookingConvert.convert(booked);
             show.setAvailableSeats(show.getAvailableSeats() - booking.getNoOfSeatsSelected());
 
             showService.updateShow(show);
             log.info(BookYourShow.DATA_SAVED + " for User ID: {}", bookingRequestDto.getUserId());
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(BookYourShow.DATA_SAVED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookingDto);
 
-        } catch (ApiException e) {
-            log.error(BookYourShow.DATA_SAVING_FAILURE + ": {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            log.error(BookYourShow.SOMETHING_WENT_WRONG + ": {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BookYourShow.SOMETHING_WENT_WRONG);
+            BookingDto baseResponseDto = new BookingDto();
+            baseResponseDto.setStatus(HttpStatus.BAD_REQUEST);
+            baseResponseDto.setMessage(BookYourShow.SEATS_NOT_AVAILABLE);
+            baseResponseDto.setLocalDateTime(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(baseResponseDto);
         }
     }
 
@@ -103,6 +114,41 @@ public class BookingServiceImpl implements BookingService {
             bookingDto.setLocalDateTime(LocalDateTime.now());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(bookingDto);
         }
+    }
+
+    @Override
+    public ResponseEntity<BookingDetails> getBookingDetails(UUID bookingId) {
+        try {
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new ApiException(BookYourShow.BOOKING_NOT_AVAILABLE));
+            BookingDetails bookingDetails = convert(booking);
+            return ResponseEntity.status(HttpStatus.OK).body(bookingDetails);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
+
+    public BookingDetails convert(Booking booking) {
+        BookingDetails bookingDetails = new BookingDetails();
+        if(!ObjectUtils.isEmpty(booking)) {
+            BeanUtils.copyProperties(booking, bookingDetails);
+            if(!ObjectUtils.isEmpty(booking.getShow())) {
+                ShowResponseDto show = new ShowResponseDto();
+                BeanUtils.copyProperties(booking.getShow(), show);
+                bookingDetails.setShow(show);
+                if(!ObjectUtils.isEmpty(booking.getShow().getTheaterMovie().getTheater())) {
+                    TheaterDto theaterDto = new TheaterDto();
+                    BeanUtils.copyProperties(booking.getShow().getTheaterMovie().getTheater(), theaterDto);
+                    bookingDetails.getShow().setTheater(theaterDto);
+                }
+            }
+            if(!ObjectUtils.isEmpty(booking.getUser())) {
+                UserDto userDto = new UserDto();
+                BeanUtils.copyProperties(booking.getUser(), userDto);
+                bookingDetails.setUser(userDto);
+            }
+        }
+        return bookingDetails;
     }
 
     public ResponseEntity<List<BookingDto>> getBookingsByUserId(UUID userId) {

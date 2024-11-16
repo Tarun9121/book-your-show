@@ -3,6 +3,7 @@ package com.bookings.service.implementation;
 import com.bookings.constants.BookYourShow;
 import com.bookings.convert.Convert;
 import com.bookings.dto.UserDto;
+import com.bookings.dto.UserRequestDto;
 import com.bookings.entity.User;
 import com.bookings.exception.ApiException;
 import com.bookings.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -28,6 +30,43 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository, Convert convert) {
         this.userRepository = userRepository;
         this.convert = convert;
+    }
+
+    public ResponseEntity<UserDto> registerUserDetails(UserRequestDto userReqDto) {
+        UserDto userDto = new UserDto();
+        try {
+            if(ObjectUtils.isEmpty(userReqDto)) {
+                throw new ApiException(BookYourShow.DATA_NULL);
+            }
+
+            User user = convert.convert(userReqDto);
+            User savedUser = userRepository.save(user);
+            userDto = convert.convert(savedUser);
+
+            return ResponseEntity.status(HttpStatus.OK).body(userDto);
+        } catch(Exception e) {
+            userDto.setStatus(HttpStatus.BAD_REQUEST);
+            userDto.setMessage(e.getMessage());
+            userDto.setLocalDateTime(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userDto);
+        }
+    }
+
+    public ResponseEntity<UserRequestDto> getUserByLoginDetails(UserRequestDto userRequestDto) {
+        UserRequestDto existingUser = new UserRequestDto();
+        try {
+            User user = userRepository.getByCrediantals(userRequestDto.getEmail(), userRequestDto.getPassword());
+            if(ObjectUtils.isEmpty(user)) {
+                throw new ApiException(BookYourShow.NO_USER_FOUND);
+            }
+            existingUser = convert.convertToRequesDto(user);
+            return ResponseEntity.status(HttpStatus.OK).body(existingUser);
+        } catch (Exception e) {
+            existingUser.setStatus(HttpStatus.BAD_REQUEST);
+            existingUser.setMessage(e.getMessage());
+            existingUser.setLocalDateTime(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(existingUser);
+        }
     }
 
     public ResponseEntity<UserDto> getUserByEmail(String email) {

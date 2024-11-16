@@ -31,6 +31,8 @@ public class User {
     @Column(nullable = false)
     private boolean deleted = false; // Soft delete flag
 
+    private String password;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Booking> bookingList = new ArrayList<>();
 }

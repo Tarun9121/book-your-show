@@ -15,4 +15,7 @@ public class  BookYourShow {
     public static final String USER_NOT_FOUND = "User not found";
     public static final String ACTOR_ALREADY_EXIST = "Actor alraedy existed";
     public static final String ACCOUNT_NOT_FOUND = "Account Not found with the give data";
+    public static final String BOOKING_NOT_AVAILABLE = "Booking details are not available for you";
+    public static final String ACTOR_NOT_FOUND = "Actor not found";
+    public static final String NO_USER_FOUND = "User Details are wrong";
 }

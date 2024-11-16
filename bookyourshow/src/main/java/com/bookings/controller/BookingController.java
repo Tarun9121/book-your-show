@@ -1,5 +1,6 @@
 package com.bookings.controller;
 
+import com.bookings.dto.BookingDetails;
 import com.bookings.dto.BookingDto;
 import com.bookings.dto.BookingRequestDto;
 import com.bookings.dto.BookingResponseDto;
@@ -27,7 +28,7 @@ public class BookingController {
 
     @Operation(summary = "Create Booking", description = "Book seats for a specific show")
     @PostMapping("/create")
-    public ResponseEntity<String> createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
+    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
         return bookingService.createBooking(bookingRequestDto);
     }
 
@@ -40,6 +41,11 @@ public class BookingController {
     @GetMapping("/get-bookings/{userId}")
     public ResponseEntity<List<BookingDto>> getBookingsByUserId(@PathVariable("userId") UUID userId) {
         return bookingService.getBookingsByUserId(userId);
+    }
+
+    @GetMapping("/booking-detail/{bookingId}")
+    public ResponseEntity<BookingDetails> getBookingDetails(@PathVariable("bookingId") UUID bookingId) {
+        return bookingService.getBookingDetails(bookingId);
     }
 
 }

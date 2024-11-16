@@ -8,8 +8,11 @@ import com.bookings.dao.ShowDao;
 import com.bookings.dao.TheaterMovieDao;
 import com.bookings.dto.AvailableShowDto;
 import com.bookings.dto.AvailableTheatersDto;
+import com.bookings.dto.MovieDto;
+import com.bookings.dto.ShowDetails;
 import com.bookings.dto.ShowDto;
 import com.bookings.dto.ShowRequestDto;
+import com.bookings.dto.TheaterDto;
 import com.bookings.dto.TheaterMovieNativeDto;
 import com.bookings.entity.Movie;
 import com.bookings.entity.Show;
@@ -26,8 +29,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -79,11 +84,12 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public ResponseEntity<String> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDtos) {
+    public ResponseEntity<List<ShowDetails>> createShow(UUID theaterId, UUID movieId, List<ShowRequestDto> showRequestDtos) {
         try {
             Theater theater = theaterService.getTheaterById(theaterId);
             Movie movie = movieService.getMovieById(movieId);
             TheaterMovie theaterMovie = theaterMovieService.getTheaterMovie(theater, movie);
+            List<ShowDetails> showDetailsList = new ArrayList<>();
 
             for (ShowRequestDto showRequestDto : showRequestDtos) {
                 Show show = new Show();
@@ -97,18 +103,19 @@ public class ShowServiceImpl implements ShowService {
                 show.setShowDate(showRequestDto.getShowDate());
                 show.setShowTime(showRequestDto.getShowTime());
 
-                showRepository.save(show);
+                Show savedShow = showRepository.save(show);
+                showDetailsList.add(convertToShowDetails(savedShow));
             }
 
             log.info("Shows created successfully for Theater ID: {} and Movie ID: {}", theaterId, movieId);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Shows created successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(showDetailsList);
 
         } catch (ApiException e) {
             log.error("Validation error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList());
         } catch (Exception e) {
             log.error("Unexpected error occurred: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create shows");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList());
         }
     }
 
@@ -121,21 +128,50 @@ public class ShowServiceImpl implements ShowService {
             showDto = convert(show);
             return ResponseEntity.status(HttpStatus.OK).body(showDto);
         } catch (ApiException e) {
-            log.error("Validation error: {}", e.getMessage());
             showDto.setMessage("Show Not Found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(showDto);
         } catch (Exception e) {
-            log.error("Unexpected error occurred: {}", e.getMessage());
             showDto.setMessage("Unexpected Error occured");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(showDto);
         }
+    }
+
+    public ResponseEntity<ShowDetails> getShowDetailsById(UUID showId) {
+        ShowDetails showDetails = new ShowDetails();
+        try {
+            Show show = showRepository.findById(showId)
+                    .orElseThrow(() -> new ApiException("Show not found with ID: " + showId));
+            showDetails = convertToShowDetails(show);
+            return ResponseEntity.status(HttpStatus.OK).body(showDetails);
+        } catch(Exception e) {
+            showDetails.setStatus(HttpStatus.BAD_REQUEST);
+            showDetails.setMessage(e.getMessage());
+            showDetails.setLocalDateTime(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.OK).body(showDetails);
+        }
+    }
+
+    public ShowDetails convertToShowDetails(Show show) {
+        ShowDetails showDetails = new ShowDetails();
+        if(!ObjectUtils.isEmpty(show)) {
+            TheaterDto theaterDto = new TheaterDto();
+            BeanUtils.copyProperties(show.getTheaterMovie().getTheater(), theaterDto);
+            showDetails.setTheater(theaterDto);
+            MovieDto movieDto = new MovieDto();
+            BeanUtils.copyProperties(show.getTheaterMovie().getMovie(), movieDto);
+            showDetails.setMovie(movieDto);
+            BeanUtils.copyProperties(show, showDetails);
+        }
+        return showDetails;
     }
 
     public ShowDto convert(Show show) {
         ShowDto showDto = new ShowDto();
         if (!ObjectUtils.isEmpty(show)) {
             showDto.setId(show.getId());
-            showDto.setId(show.getTheaterMovie().getId());
+            showDto.setTheaterId(show.getTheaterMovie().getId());
+            showDto.setMovieId(show.getTheaterMovie().getId());
+            showDto.setShowDate(show.getShowDate());
             showDto.setShowTime(show.getShowTime());
         }
         return showDto;

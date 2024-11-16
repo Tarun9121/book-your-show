@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.UUID;
 
-@Entity @Table(name="casting")
+@Entity @Table
 @Data @NoArgsConstructor @AllArgsConstructor
 public class MovieCast {
     @Id

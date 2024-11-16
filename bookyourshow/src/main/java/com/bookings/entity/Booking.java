@@ -35,5 +35,6 @@ public class Booking {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "show_id")
     private Show show;
+
     private Integer noOfSeatsSelected;
 }
